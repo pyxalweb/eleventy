@@ -1,0 +1,346 @@
+-----------------------------------------------------------------------------------
+LOCAL ELEVENTY INSTALL
+-----------------------------------------------------------------------------------
+
+*** Open your "jamstack-test" project folder in a new VS Code window.
+
+
+
+
+*** Create a new directory called "eleventy"
+
+
+
+
+*** In the VS Code terminal, enter:
+cd eleventy
+npm init -y
+
+
+
+
+*** In the VS Code terminal, enter:
+npm install @11ty/eleventy --save-dev
+
+
+
+
+*** Open the package.json file and delete the following line:
+"test": "echo \"Error: no test specified\" && exit 1"
+
+
+
+
+*** Replace it with:
+"start": "eleventy --serve",
+"build": "eleventy"
+
+
+
+
+*** Create a new file called ".eleventy.js" (this file must have a "." at the beginning of the file name!) and add the following:
+module.exports = function(eleventyConfig) {
+    return {
+        dir: {
+            input: "src",
+            output: "public"
+        }
+    };
+}
+
+
+
+
+*** Create a new directory called "src" and a new file called "index.njk" and add the following HTML:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document!</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <p>Test!</p>
+</body>
+</html>
+
+
+
+
+*** In the VS Code terminal, enter:
+npm start
+
+
+
+
+*** The "eleventy --serve" start command configured in package.json should run and you should see the following:
+[11ty] Writing public/index.html from ./src/index.njk
+[11ty] Wrote 1 file in 0.06 seconds (v1.0.0)
+[11ty] Watching…
+[Browsersync] Access URLs:
+ --------------------------------       
+    Local: http://localhost:8081        
+ External: http://10.0.0.207:8081       
+ --------------------------------       
+[Browsersync] Serving files from: public
+
+
+
+
+*** Open http://localhost:8081 and you will see the test index page you created.
+
+
+
+
+-----------------------------------------------------------------------------------
+ELEVENTY LAYOUT
+-----------------------------------------------------------------------------------
+
+*** Create a new directory called "_includes" within the "eleventy/src" directory.
+
+
+
+
+*** Create a new file called "base.njk" within the "_includes" directory and add the following:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <main>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+    </main>
+</body>
+</html>
+
+
+
+
+*** Open index.njk and delete everything. Then add the following frontmatter to the very first line:
+---
+title: Hello World!
+layout: 'base.njk'
+---
+
+
+
+
+*** Create a new file called "header.njk" within the "_includes" directory and add the following:
+<header>
+    <h1>{{ title }}</h1>
+</header>
+
+
+
+
+*** In base.njk add the following line above the opening <main> tag:
+{% include 'header.njk' %}
+
+
+
+
+*** Create a new file called "footer.njk" within the "_includes" directory and add the following:
+<footer>
+    <p>Here's the footer!</p>
+</footer>
+
+
+
+
+*** In base.njk add the following line below the closing <main> tag:
+{% include 'footer.njk' %}
+
+
+
+
+*** Your "base.njk" file should now look like this:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    {% include 'header.njk' %}
+    <main>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+    </main>
+    {% include 'footer.njk' %}
+</body>
+</html>
+
+
+
+
+*** Replace the "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>" line in "base.njk" with the following:
+{{ content | safe }}
+This will pull whatever markup you have below your frontmatter within your "index.njk" file (or any other file using "base.njk" as the template). The "safe" tells it that it is okay to render the HTML elements.
+
+
+
+
+*** In your "index.njk" file, directly below the frontmatter, add the following:
+<p>Lorem ipsum dolor!</p>
+
+
+
+
+*** Create a new "styles.scss" file within your "src" directory and add the following:
+html {
+  box-sizing: border-box;
+  font-size: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  display: grid;
+  grid-template-rows: minmax(100px, 10vh) 1fr minmax(100px, 10vh);
+  height: 100vh;
+  background: rebeccapurple;
+  color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 20px;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 2.25rem;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+header,
+main,
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1em;
+  text-align: center;
+}
+
+header,
+footer {
+  background: blueviolet;
+}
+
+main {
+  flex-direction: column;
+}
+
+
+
+
+*** Install the "Live Sass Compiler" extension in VS Code. Then click the "Watch SASS" button in the bar at the bottom of your VS Code window. Upon saving your "style.scss" file it should then compile a "style.css" file.
+
+
+
+
+*** Open ".eleventy.js" and add the following to your module.exports function:
+eleventyConfig.addPassthroughCopy('./src/style.css');
+Your page should now have the desired styling in place.
+
+
+
+
+*** Create a new "blog" directory within the "src" directory.
+
+
+
+
+*** Within the "blog" directory, create a file called "2022-03-19-test-post.md" and add the following:
+---
+title: Test Post
+author: Alex Winter
+date: 2022-03-19
+tags: post
+image: /assets/blog/article-1.jpg
+imageAlt: Testing 123
+description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus feugiat lobortis bibendum. Proin in maximus massa. Suspendisse felis velit, sagittis nec lectus at, vehicula malesuada enim. Aenean orci lorem.
+---
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus feugiat lobortis bibendum. Proin in maximus massa. Suspendisse felis velit, sagittis nec lectus at, vehicula malesuada enim. Aenean orci lorem, imperdiet vel fermentum sed, tincidunt sit amet ante.
+
+Curabitur vel ligula quis nisi suscipit tincidunt. Sed nec erat sit amet orci fringilla laoreet. Proin et tempor libero. Vestibulum nisl mi, mattis vitae tristique in, vulputate eget metus. Donec tincidunt lacinia nisi eget luctus.
+
+
+
+
+*** Within the "blog" directory, create a file called "2022-03-20-another-test-post.md" and add the following:
+---
+title: Another Test Post
+author: Alex Winter
+date: 2022-03-20
+tags: ["post", "featured"]
+image: /assets/blog/article-1.jpg
+imageAlt: Testing 123
+description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur justo leo, mattis accumsan dictum vel, sollicitudin eu justo. Donec sit amet massa justo. Nullam odio turpis, mattis a malesuada eget, auctor sed.
+---
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur justo leo, mattis accumsan dictum vel, sollicitudin eu justo. Donec sit amet massa justo. Nullam odio turpis, mattis a malesuada eget, auctor sed velit.
+
+Suspendisse nec posuere eros, in laoreet elit. Donec blandit scelerisque nibh id pharetra. Praesent eget tempus mi, nec semper velit. Duis vehicula turpis vel bibendum dignissim.
+
+
+
+
+*** Within the "blog" directory, create a file called "2022-03-21-one-more-test-post.md" and add the following:
+---
+title: One More Test Post
+author: Alex Winter
+date: 2022-03-21
+tags: post
+image: /assets/blog/article-1.jpg
+imageAlt: Testing 123
+description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed libero nunc, accumsan sit amet metus sed, scelerisque porttitor est. Etiam in tortor nulla. Donec ac volutpat mi.
+---
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed libero nunc, accumsan sit amet metus sed, scelerisque porttitor est. Etiam in tortor nulla. Donec ac volutpat mi.
+
+Morbi libero odio, mattis vitae tristique eget, condimentum quis purus. Mauris aliquet turpis sit amet facilisis elementum. Integer ullamcorper blandit lacinia. Mauris quis ipsum tristique, pharetra eros vitae, interdum est.
+
+
+
+
+*** Within the "blog" directory, create a file called "blog.json" and add the following:
+{
+    "tags": "post"
+}
+
+This makes sure that even if you forget "tags: post" within your markdown files' frontmatter, then they will still be apart of the "post" collection.
+
+
+
+
+*** Open "index.njk" and below your "<p>Lorem ipsum dolor!</p>" line, add the following loop:
+<section class="blog-posts">
+    {%- for post in collections.post | reverse -%}
+        <article>
+            <h2>{{ post.data.title }}</h2>
+        </article>
+    {%- endfor %}
+</section>
+
+This gets each post within the "post" collection (tag) and displays the title from that specific post's frontmatter.
+It is also set to display each post in "reverse" order as we would want the newest posts first in this use case.
+
+
+
+
